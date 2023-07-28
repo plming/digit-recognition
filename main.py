@@ -1,19 +1,37 @@
 import cv2
+import numpy as np
+from keras.models import load_model
 
-# 실행 시 장치 번호 확인하기
-DEVICE_INDEX = 0
-capture = cv2.VideoCapture(DEVICE_INDEX)
+WIDTH, HEIGHT = 640, 480
 
-_ret, frame = capture.read()
+model = load_model('model.h5', compile=False)
 
-# 비디오 입력 테스트
-# Expected: (480, 640, 3)
-print(f"비디오 크기: {frame.shape}")
+capture = cv2.VideoCapture(0)
 
 while True:
     ret, frame = capture.read()
 
+    # TODO: 임시 해상도 조정을 위한 코드로 실 환경에선 제거해야 함
+    frame = cv2.resize(src=frame, dsize=(WIDTH, HEIGHT), interpolation=cv2.INTER_AREA)
+
+    box_size = HEIGHT // 2
+    left_top = (WIDTH // 2 - box_size // 2, HEIGHT // 2 - box_size // 2)
+    right_bottom = (WIDTH // 2 + box_size // 2, HEIGHT // 2 + box_size // 2)
+
+    GREEN = (0, 255, 0)
+    cv2.rectangle(frame, left_top, right_bottom, GREEN, 2)
+
+    roi = frame[left_top[1]:right_bottom[1], left_top[0]:right_bottom[0]]
+
+    x = cv2.resize(roi, (28, 28), interpolation=cv2.INTER_AREA)
+    x = np.expand_dims(x, axis=0)
+
+    pred = model.predict(x, verbose=0)
+    print(f"인식된 숫자는 {np.argmax(pred)}입니다.")
+
     cv2.imshow('Video', frame)
+    cv2.imshow('ROI', roi)
+    cv2.imshow('Resized ROI', x[0])
 
     if cv2.waitKey(1) == ord('q'):
         break
