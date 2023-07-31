@@ -4,7 +4,7 @@ from keras.models import load_model
 
 WIDTH, HEIGHT = 640, 480
 
-model = load_model('model.h5', compile=False)
+model = load_model('model.keras', compile=False)
 
 capture = cv2.VideoCapture(0)
 
