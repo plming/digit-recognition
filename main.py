@@ -1,13 +1,17 @@
-import cv2
 from datetime import datetime
+
+import cv2
 import numpy as np
 from keras.models import load_model
+
+from recognizer import DigitRecognizer
 
 if __name__ == '__main__':
     print("사용법")
     print("q: 종료 / s: 스크린샷")
 
     model = load_model('model-2023-08-04T09:51:44.880996.keras', compile=False)
+    recognizer = DigitRecognizer(model)
 
     capture = cv2.VideoCapture(0)
     if not capture.isOpened():
@@ -33,25 +37,9 @@ if __name__ == '__main__':
 
             x, y, w, h = cv2.boundingRect(largest_contour)
 
-            # 20x20으로 축소한 후, 4px의 테두리를 추가함
-            # 총 28x28의 이미지가 됨
-            # 여백이 4인 이유는 아래 링크 참조
-            # 참조: http://yann.lecun.com/exdb/mnist/
-            model_input = mask[y:y + h, x:x + w].copy()
-            model_input = cv2.resize(model_input, (20, 20), interpolation=cv2.INTER_AREA)
-
-            border_size = 4
-            model_input = cv2.copyMakeBorder(model_input, border_size, border_size, border_size, border_size,
-                                             cv2.BORDER_CONSTANT, value=0)
-            model_input = model_input / 255
-            model_input = model_input.reshape((1, 28, 28, 1))
-
-            # CNN 모델로 분류하기
-            assert model_input.shape == (1, 28, 28, 1)
-            assert np.min(model_input) >= 0 and np.max(model_input) <= 1
-            pred = model.predict(model_input, verbose=0)
+            pred = recognizer.run(mask[y:y + h, x:x + w])
             digit = np.argmax(pred)
-            probability = pred[0][digit]
+            probability = pred[digit]
 
             cv2.putText(
                 img=frame,
@@ -64,7 +52,6 @@ if __name__ == '__main__':
             )
 
             cv2.rectangle(frame, (x, y), (x + w, y + h), UI_COLOR, 2)
-            cv2.imshow('x', cv2.resize(model_input[0], (200, 200)))
 
         cv2.imshow('frame', frame)
 
