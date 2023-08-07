@@ -15,7 +15,9 @@ if __name__ == '__main__':
 
     UI_COLOR = [0, 0, 0xFF]
     while True:
-        _, frame = capture.read()
+        has_read, frame = capture.read()
+        if not has_read:
+            continue
 
         blur = cv2.GaussianBlur(frame, (9, 9), 0)
 
@@ -31,17 +33,22 @@ if __name__ == '__main__':
 
             x, y, w, h = cv2.boundingRect(largest_contour)
 
+            # 20x20으로 축소한 후, 4px의 테두리를 추가함
+            # 총 28x28의 이미지가 됨
+            # 여백이 4인 이유는 아래 링크 참조
+            # 참조: http://yann.lecun.com/exdb/mnist/
             model_input = mask[y:y + h, x:x + w].copy()
-            border_size = max(w, h) // 2
+            model_input = cv2.resize(model_input, (20, 20), interpolation=cv2.INTER_AREA)
+
+            border_size = 4
             model_input = cv2.copyMakeBorder(model_input, border_size, border_size, border_size, border_size,
                                              cv2.BORDER_CONSTANT, value=0)
-            model_input = cv2.resize(model_input, (28, 28), interpolation=cv2.INTER_AREA)
-            model_input = cv2.GaussianBlur(model_input, (3, 3), 0)
             model_input = model_input / 255
             model_input = model_input.reshape((1, 28, 28, 1))
 
             # CNN 모델로 분류하기
             assert model_input.shape == (1, 28, 28, 1)
+            assert np.min(model_input) >= 0 and np.max(model_input) <= 1
             pred = model.predict(model_input, verbose=0)
             digit = np.argmax(pred)
             probability = pred[0][digit]
@@ -64,9 +71,7 @@ if __name__ == '__main__':
         cmd = cv2.waitKey(1)
         if cmd == ord('q'):
             break
-        elif cmd == ord('d'):
-            print(x.reshape(28, 28))
         elif cmd == ord('s'):
-            filename = "screenshot-" + datetime.utcnow().isoformat() + ".jpg"
+            filename = f"screenshot-{datetime.utcnow().isoformat()}.jpg"
             cv2.imwrite(filename, frame)
             print(f"이미지가 {filename}에 저장되었습니다.")
