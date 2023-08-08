@@ -24,7 +24,11 @@ class DigitRecognizer:
         x_max = np.max(x)
         x = (x - x_min) / (x_max - x_min)
 
+        if __debug__:
+            cv2.imshow('digit', cv2.resize(x, (112, 112)))
+
         x = x.reshape((1, 28, 28, 1))
-        probabilities = self.model.predict(x)
+        probabilities = self.model.predict(x, verbose=0)
+        assert probabilities.shape == (1, 10)
 
         return probabilities[0]
