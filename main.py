@@ -7,7 +7,7 @@ from recognizer import DigitRecognizer
 
 if __name__ == '__main__':
     print("사용법")
-    print("q: 종료 / s: 스크린샷")
+    print("q: 종료")
 
     model = load_model('model.keras', compile=False)
     recognizer = DigitRecognizer(model)
