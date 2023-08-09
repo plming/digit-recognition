@@ -4,10 +4,23 @@ from keras.models import Model
 
 
 class DigitRecognizer:
+    """
+    숫자 인식기 클래스입니다.
+    """
+
     def __init__(self, model: Model):
+        """
+        숫자 인식기 생성자입니다.
+        :param model: MNIST로 학습된 Keras 모델
+        """
         self.model = model
 
     def run(self, gray_image: np.ndarray) -> np.ndarray:
+        """
+        주어진 이미지에서 숫자를 인식합니다.
+        :param gray_image: 숫자가 쓰여진 gray 이미지
+        :return: 각 숫자에 대한 예측 확률을 담은 배열
+        """
         assert gray_image.ndim == 2
 
         # MNIST 데이터셋의 전처리 과정
