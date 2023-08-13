@@ -1,41 +1,36 @@
-from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Tuple
 
 import cv2
 import numpy as np
 
-
-@dataclass(frozen=True)
-class Region:
-    """
-    숫자 영역을 나타내는 클래스입니다.
-    """
-    x: int
-    y: int
-    width: int
-    height: int
-    mask: np.ndarray
+from bounding_box import BoundingBox
 
 
-def detect_digit(image: np.ndarray) -> Optional[Region]:
+def detect_digit(image: np.ndarray) -> Optional[Tuple[BoundingBox, np.ndarray]]:
     """
-    주어진 이미지에서 숫자 영역을 탐지합니다. 이미지에 숫자는 최대 1개만 존재한다 가정합니다.
-    숫자는 흰 배경에 빨간색으로 쓰여져 있어야 합니다.
-    :param image: 숫자 영역을 찾을 BGR 이미지
-    :return: 숫자 영역을 찾았다면 Region 객체, 아니라면 None
+    주어진 이미지에서 숫자를 검출합니다.
+    :param image: 검출할 이미지
+    :return: 숫자가 검출된 경우 (경계 상자, 이진화된 이미지), 검출되지 않은 경우 None
     """
     blur = cv2.GaussianBlur(image, (9, 9), 0)
     hsv = cv2.cvtColor(blur, cv2.COLOR_BGR2HSV)
 
-    mask = cv2.inRange(hsv, (0, 70, 50), (10, 255, 255))
-    cv2.imshow('mask', mask)
-    morphology = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))
-    contours, _ = cv2.findContours(morphology, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-    if len(contours) == 0:
+    white_mask = cv2.inRange(hsv, (0, 0, 200), (180, 30, 255))
+    white_contours, _ = cv2.findContours(white_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    if len(white_contours) == 0:
         return None
+    white_contour = max(white_contours, key=cv2.contourArea)
+    white_box = BoundingBox(*cv2.boundingRect(white_contour))
 
-    largest_contour = max(contours, key=cv2.contourArea)
-    x, y, w, h = cv2.boundingRect(largest_contour)
-    region = Region(x, y, w, h, mask[y:y + h, x:x + w])
-    return region
+    red_mask1 = cv2.inRange(hsv, (0, 100, 100), (10, 255, 255))
+    red_mask2 = cv2.inRange(hsv, (170, 100, 100), (180, 255, 255))
+    red_mask = cv2.bitwise_or(red_mask1, red_mask2)
+    red_contours, _ = cv2.findContours(red_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    red_contours = sorted(red_contours, key=cv2.contourArea, reverse=True)
+    for red_contour in red_contours:
+        red_box = BoundingBox(*cv2.boundingRect(red_contour))
+        if red_box.is_inside(white_box):
+            region_of_interest = red_box.crop(red_mask)
+            return red_box, region_of_interest
+
+    return None

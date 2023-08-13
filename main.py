@@ -22,14 +22,17 @@ if __name__ == '__main__':
         if not has_read:
             continue
 
-        region = detect_digit(frame)
-        if region is not None:
-            pred = recognizer.run(region.mask)
+        detection_result = detect_digit(frame)
+        if detection_result is not None:
+            bounding_box, region = detection_result
+
+            pred = recognizer.run(region)
             digit = np.argmax(pred)
             probability = pred[digit]
 
-            cv2.rectangle(frame, (region.x, region.y), (region.x + region.width, region.y + region.height), UI_COLOR, 2)
-            cv2.putText(frame, f"{digit} ({probability:.2f})", (region.x, region.y - 10),
+            cv2.rectangle(frame, (bounding_box.x, bounding_box.y),
+                          (bounding_box.x + bounding_box.width, bounding_box.y + bounding_box.height), UI_COLOR, 2)
+            cv2.putText(frame, f"{digit} ({probability:.2f})", (bounding_box.x, bounding_box.y - 10),
                         cv2.FONT_HERSHEY_SIMPLEX, 1, UI_COLOR, 2)
 
         cv2.imshow('out', frame)
