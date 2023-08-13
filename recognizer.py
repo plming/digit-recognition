@@ -15,18 +15,21 @@ class DigitRecognizer:
         """
         self.model = model
 
-    def run(self, gray_image: np.ndarray) -> np.ndarray:
+    def run(self, bgr_image: np.ndarray) -> np.ndarray:
         """
         주어진 이미지에서 숫자를 인식합니다.
-        :param gray_image: 숫자가 쓰여진 gray 이미지
+        :param bgr_image: 숫자가 쓰여진 BGR 이미지
         :return: 각 숫자에 대한 예측 확률을 담은 배열
         """
-        assert gray_image.ndim == 2
+        assert bgr_image.ndim == 3
+
+        gray = cv2.cvtColor(bgr_image, cv2.COLOR_BGR2GRAY)
+        _, binary = cv2.threshold(gray, 0, 0xFF, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
 
         # MNIST 데이터셋의 전처리 과정
         # 참고: http://yann.lecun.com/exdb/mnist/
         BASE_SIZE = (20, 20)
-        base = cv2.resize(gray_image, BASE_SIZE, interpolation=cv2.INTER_AREA)
+        base = cv2.resize(binary, BASE_SIZE, interpolation=cv2.INTER_AREA)
 
         BORDER_SIZE = 4
         x = cv2.copyMakeBorder(base, BORDER_SIZE, BORDER_SIZE, BORDER_SIZE, BORDER_SIZE,

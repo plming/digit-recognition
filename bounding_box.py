@@ -35,7 +35,7 @@ class BoundingBox:
         :param image: 영역을 잘라낼 이미지
         :return: 잘라낸 영역
         """
-        return image[self.y:self.y + self.height, self.x:self.x + self.width]
+        return image[self.y:self.y + self.height, self.x:self.x + self.width].copy()
 
     def is_inside(self, other) -> bool:
         """

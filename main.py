@@ -22,11 +22,11 @@ if __name__ == '__main__':
         if not has_read:
             continue
 
-        detection_result = detect_digit(frame)
-        if detection_result is not None:
-            bounding_box, region = detection_result
+        bounding_box = detect_digit(frame)
+        if bounding_box is not None:
+            cropped = bounding_box.crop(frame)
 
-            pred = recognizer.run(region)
+            pred = recognizer.run(cropped)
             digit = np.argmax(pred)
             probability = pred[digit]
 
