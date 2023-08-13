@@ -30,8 +30,7 @@ if __name__ == '__main__':
             digit = np.argmax(pred)
             probability = pred[digit]
 
-            cv2.rectangle(frame, (bounding_box.x, bounding_box.y),
-                          (bounding_box.x + bounding_box.width, bounding_box.y + bounding_box.height), UI_COLOR, 2)
+            cv2.rectangle(frame, bounding_box.left_top, bounding_box.right_bottom, UI_COLOR, 2)
             cv2.putText(frame, f"{digit} ({probability:.2f})", (bounding_box.x, bounding_box.y - 10),
                         cv2.FONT_HERSHEY_SIMPLEX, 1, UI_COLOR, 2)
 

@@ -13,6 +13,22 @@ class BoundingBox:
     width: int
     height: int
 
+    @property
+    def left_top(self) -> np.ndarray:
+        """
+        경계 상자의 좌상단 좌표를 반환합니다.
+        :return: 경계 상자의 좌상단 좌표
+        """
+        return np.array([self.x, self.y])
+
+    @property
+    def right_bottom(self) -> np.ndarray:
+        """
+        경계 상자의 우하단 좌표를 반환합니다.
+        :return: 경계 상자의 우하단 좌표
+        """
+        return np.array([self.x + self.width, self.y + self.height])
+
     def crop(self, image: np.ndarray) -> np.ndarray:
         """
         주어진 이미지에서 이 영역을 잘라냅니다.
