@@ -35,7 +35,13 @@ python3 main.py
 
 1. Digit Detection
     - 숫자가 적힌 이미지 내 영역을 추출
+    - 번호판에 대한 색상 정보에 기반하여, 색상 필터로 영역 추출
 2. Digit Recognition
     - MNIST 데이터셋으로 학습한 CNN 모델 사용
-    - 1에서 추출한 숫자 이미지를 입력으로 사용
+    - Detection 단계에서 추출한 숫자 이미지를 입력으로 사용
     - 0~9 숫자 중 하나로 분류
+
+## 참고자료
+
+- [MNIST 데이터셋](http://yann.lecun.com/exdb/mnist)
+- [Introduction to Scene Text Detection and Recognition](http://dmqm.korea.ac.kr/activity/seminar/320)
