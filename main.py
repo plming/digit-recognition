@@ -9,7 +9,7 @@ if __name__ == '__main__':
     print("사용법")
     print("q: 종료")
 
-    model = load_model('model.keras', compile=False)
+    model = load_model('model', compile=False)
     recognizer = DigitRecognizer(model)
 
     capture = cv2.VideoCapture(1)
