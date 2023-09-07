@@ -24,8 +24,8 @@ def detect_digit(bgr_image: np.ndarray) -> Optional[BoundingBox]:
     white_box = BoundingBox(*cv2.boundingRect(white_contour))
 
     # 빨간색(번호판 숫자 색상) 검출하기
-    red_mask1 = cv2.inRange(hsv, (0, 100, 100), (10, 255, 255))
-    red_mask2 = cv2.inRange(hsv, (170, 100, 100), (180, 255, 255))
+    red_mask1 = cv2.inRange(hsv, (0, 128, 128), (10, 255, 255))
+    red_mask2 = cv2.inRange(hsv, (170, 128, 128), (180, 255, 255))
     red_mask = cv2.bitwise_or(red_mask1, red_mask2)
     red_contours, _ = cv2.findContours(red_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     red_contours = sorted(red_contours, key=cv2.contourArea, reverse=True)
