@@ -28,12 +28,23 @@ class DigitRecognizer:
 
         # MNIST 데이터셋의 전처리 과정
         # 참고: http://yann.lecun.com/exdb/mnist/
-        BASE_SIZE = (20, 20)
-        base = cv2.resize(binary, BASE_SIZE, interpolation=cv2.INTER_AREA)
 
-        BORDER_SIZE = 4
-        x = cv2.copyMakeBorder(base, BORDER_SIZE, BORDER_SIZE, BORDER_SIZE, BORDER_SIZE,
+        # normalize size to 20x20 with preserving aspect ratio
+        aspect_ratio = binary.shape[1] / binary.shape[0]
+        if aspect_ratio > 1:
+            new_width = 20
+            new_height = int(new_width / aspect_ratio)
+        else:
+            new_height = 20
+            new_width = int(new_height * aspect_ratio)
+
+        binary = cv2.resize(binary, (new_width, new_height), interpolation=cv2.INTER_AREA)
+        x = cv2.copyMakeBorder(binary,
+                               (28 - new_height) // 2, (28 - new_height) // 2,
+                               (28 - new_width) // 2, (28 - new_width) // 2,
                                cv2.BORDER_CONSTANT, value=0)
+
+        x = cv2.resize(x, (28, 28), interpolation=cv2.INTER_AREA)
 
         # x값이 [0, 1] 범위에 있도록 scaling
         x_min = np.min(x)

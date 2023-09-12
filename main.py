@@ -9,7 +9,7 @@ if __name__ == '__main__':
     print("사용법")
     print("q: 종료")
 
-    model = load_model('model', compile=False)
+    model = load_model('model.keras', compile=False)
     recognizer = DigitRecognizer(model)
 
     capture = cv2.VideoCapture(1)
@@ -20,6 +20,7 @@ if __name__ == '__main__':
     while True:
         has_read, frame = capture.read()
         if not has_read:
+            print("frame has not read")
             continue
 
         bounding_box = detect_digit(frame)

@@ -17,6 +17,10 @@ def detect_digit(bgr_image: np.ndarray) -> Optional[BoundingBox]:
 
     # 흰색(번호판 배경 색상) 검출하기
     white_mask = cv2.inRange(hsv, (0, 0, 200), (180, 30, 255))
+
+    if __debug__:
+        cv2.imshow('white_mask', white_mask)
+
     white_contours, _ = cv2.findContours(white_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     if len(white_contours) == 0:
         return None
@@ -27,6 +31,10 @@ def detect_digit(bgr_image: np.ndarray) -> Optional[BoundingBox]:
     red_mask1 = cv2.inRange(hsv, (0, 128, 128), (10, 255, 255))
     red_mask2 = cv2.inRange(hsv, (170, 128, 128), (180, 255, 255))
     red_mask = cv2.bitwise_or(red_mask1, red_mask2)
+
+    if __debug__:
+        cv2.imshow('red_mask', red_mask)
+
     red_contours, _ = cv2.findContours(red_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     red_contours = sorted(red_contours, key=cv2.contourArea, reverse=True)
     for red_contour in red_contours:
