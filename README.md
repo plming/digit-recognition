@@ -2,7 +2,7 @@
 
 ## 소개
 
-[부산대학교 총장배 창의비행체 경진대회](https://cafe.naver.com/pnucreative/2072)의 회전익 번호판 인식 임무에 사용할 프로그램입니다.
+[제15회 부산대 총장배 창의비행체 경진대회](https://cafe.naver.com/pnucreative/2072) 회전익 부문의 번호판 인식 임무에 사용할 프로그램입니다.
 
 ## 설치 및 실행
 
@@ -15,7 +15,7 @@ python3 -m venv venv
 2. 의존성 설치
 
 ```bash
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
 3. 실행
